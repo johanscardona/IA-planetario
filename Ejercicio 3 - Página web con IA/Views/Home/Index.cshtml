@@ -1,0 +1,392 @@
+@{
+    ViewData["Title"] = "Astralis | Exploración espacial";
+}
+
+<div id="app-viewport" class="app-viewport">
+    <!-- Lienzo 3D principal renderizado por WebGL / Three.js -->
+    <canvas id="webgl-canvas" class="webgl-canvas"></canvas>
+    <div id="scene-fallback" class="scene-fallback" aria-label="Vista esquemática de objetos celestes" hidden></div>
+
+    <!-- Barra superior: identidad, navegación astronómica y estado -->
+    <header class="top-nav-bar">
+        <div class="nav-brand">
+            <div class="brand-radar"></div>
+            <div class="brand-text">
+                <span class="brand-title">ASTRALIS</span>
+                <span class="brand-subtitle">EXPLORACIÓN ESPACIAL</span>
+            </div>
+        </div>
+
+        <!-- Selector de secciones -->
+        <nav class="section-nav" aria-label="Navegación astronómica">
+            <button class="nav-tab active" data-section="sistemaSolar" id="tab-sistema-solar" aria-pressed="true">
+                <span class="tab-icon">🪐</span>
+                <span class="tab-label">SISTEMA SOLAR</span>
+                <span class="nav-count" id="count-sistemaSolar">9</span>
+            </button>
+            <button class="nav-tab" data-section="constelaciones" id="tab-constelaciones" aria-pressed="false">
+                <span class="tab-icon">✨</span>
+                <span class="tab-label">CONSTELACIONES</span>
+                <span class="nav-count" id="count-constelaciones">5</span>
+            </button>
+            <button class="nav-tab" data-section="galaxias" id="tab-galaxias" aria-pressed="false">
+                <span class="tab-icon">🌌</span>
+                <span class="tab-label">GALAXIAS</span>
+                <span class="nav-count" id="count-galaxias">6</span>
+            </button>
+            <button class="nav-tab" data-section="nasa" id="tab-nasa" aria-pressed="false">
+                <span class="tab-icon">🛰️</span>
+                <span class="tab-label">NASA</span>
+            </button>
+            <button class="nav-tab" data-section="carreras" id="tab-carreras" aria-pressed="false">
+                <span class="tab-icon">🧑‍🚀</span>
+                <span class="tab-label">CARRERAS</span>
+            </button>
+        </nav>
+
+        <!-- Indicador de Telemetría y Controles Globales -->
+        <div class="nav-status">
+            <div class="system-status-pill">
+                <span class="status-dot"></span>
+                <span class="status-label">MODO EXPLORACIÓN</span>
+            </div>
+            <div class="active-object-status">OBJETIVO <strong id="active-object-name">NINGUNO</strong></div>
+        </div>
+    </header>
+
+    <section class="scene-overview scene-ui" aria-live="polite">
+        <span class="overview-kicker">MAPA CELESTE / <span id="overview-index">01</span></span>
+        <h1 id="section-title">Sistema Solar</h1>
+        <p id="section-description">El Sol y los ocho planetas que lo orbitan. Tamaños y distancias adaptados para que todo quepa en el visor.</p>
+        <span class="overview-count"><strong id="section-object-count">9</strong> OBJETOS PARA EXPLORAR</span>
+        <p id="explore-hint" class="explore-hint">
+            <span class="hint-pulse"></span>
+            <span id="hint-text">Selecciona un objeto para iniciar la exploración.</span>
+        </p>
+        <button id="btn-reset-camera" class="btn-hud-control" title="Restablecer la vista general">
+            <span class="control-icon">◎</span>
+            <span class="control-text">VISTA GENERAL</span>
+        </button>
+    </section>
+
+    <div id="object-labels" class="object-labels scene-ui" aria-label="Etiquetas de objetos celestes"></div>
+
+    <nav class="object-dock scene-ui" aria-label="Objetos de la sección">
+        <div class="dock-heading">
+            <div>
+                <span class="dock-kicker">CATÁLOGO DE VUELO</span>
+                <h2 id="dock-title">Sistema Solar</h2>
+            </div>
+        </div>
+        <div id="object-dock-items" class="object-dock-items"></div>
+    </nav>
+
+    <main id="nasa-portal" class="nasa-portal content-portal" hidden aria-label="NASA en Español">
+    <section class="mission-hero" aria-label="Resumen de exploración espacial">
+        <div class="hero-copy">
+            <span class="eyebrow">INSPIRADO EN NASA EN ESPAÑOL</span>
+            <h1>El universo está más cerca de lo que imaginas.</h1>
+            <p>
+                Explora las misiones, los descubrimientos y las historias de la NASA en español. La ciencia nos ayuda a comprender
+                el cosmos y nuestro propio planeta.
+            </p>
+            <div class="hero-actions">
+                <a class="btn-primary" href="https://www.nasa.gov/es/" target="_blank" rel="noopener noreferrer">Descubre Artemis II <span aria-hidden="true">↗</span></a>
+                <a class="btn-secondary" href="https://ciencia.nasa.gov/" target="_blank" rel="noopener noreferrer">Explora la ciencia <span aria-hidden="true">↗</span></a>
+            </div>
+            <ul class="hero-metrics" aria-label="Datos destacados de la exploración espacial">
+                <li>
+                    <strong>Artemis II</strong>
+                    <span>Exploración lunar</span>
+                </li>
+                <li>
+                    <strong>ISS</strong>
+                    <span>Laboratorio orbital</span>
+                </li>
+                <li>
+                    <strong>STEM</strong>
+                    <span>Aprender haciendo</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="hero-feature-card">
+            <div class="feature-header">
+                <span class="feature-kicker">HISTORIA DESTACADA</span>
+                <span class="feature-tag">ARTEMIS</span>
+            </div>
+            <h2>La próxima generación de exploración lunar comienza aquí.</h2>
+            <div class="feature-list">
+                <div>
+                    <span class="list-label">Misión tripulada</span>
+                    <p>Conoce los objetivos y la tripulación de Artemis II.</p>
+                </div>
+                <div>
+                    <a class="feature-link" href="https://www.nasa.gov/es/" target="_blank" rel="noopener noreferrer">Ver la misión <span aria-hidden="true">→</span></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="discover-section" aria-labelledby="discover-title">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">SIGUE EXPLORANDO</span>
+                <h2 id="discover-title">Descubre más temas de la NASA</h2>
+            </div>
+            <p>Historias y recursos para explorar el espacio, comprender la Tierra y despertar nuevas preguntas.</p>
+        </div>
+        <div class="story-grid">
+            <a class="story-card story-card-featured" href="https://ciencia.nasa.gov/" target="_blank" rel="noopener noreferrer">
+                <span class="story-icon" aria-hidden="true">✦</span>
+                <span class="story-category">CIENCIA PARA TODOS</span>
+                <h3>El universo, una pregunta a la vez</h3>
+                <p>Descubrimientos, investigaciones y recursos para comprender nuestro lugar en el cosmos.</p>
+                <span class="story-link">Explorar ciencia <span aria-hidden="true">↗</span></span>
+            </a>
+            <a class="story-card" href="https://www.nasa.gov/podcasts/universo-curioso-de-la-nasa/" target="_blank" rel="noopener noreferrer">
+                <span class="story-icon" aria-hidden="true">◉</span>
+                <span class="story-category">PÓDCAST</span>
+                <h3>Universo Curioso</h3>
+                <p>Un viaje por el cosmos con la NASA como guía, en tu idioma.</p>
+                <span class="story-link">Escuchar episodios <span aria-hidden="true">↗</span></span>
+            </a>
+            <a class="story-card" href="https://climate.nasa.gov/" target="_blank" rel="noopener noreferrer">
+                <span class="story-icon" aria-hidden="true">◎</span>
+                <span class="story-category">NUESTRO PLANETA</span>
+                <h3>La Tierra desde el espacio</h3>
+                <p>Observaciones satelitales que ayudan a entender los cambios de nuestro planeta.</p>
+                <span class="story-link">Explorar el clima <span aria-hidden="true">↗</span></span>
+            </a>
+            <a class="story-card" href="https://www.nasa.gov/learning-resources/productos-de-stem-en-espanol/" target="_blank" rel="noopener noreferrer">
+                <span class="story-icon" aria-hidden="true">⌘</span>
+                <span class="story-category">APRENDIZAJE</span>
+                <h3>STEM para mentes curiosas</h3>
+                <p>Actividades y materiales para estudiantes, docentes y familias.</p>
+                <span class="story-link">Ver recursos STEM <span aria-hidden="true">↗</span></span>
+            </a>
+            <a class="story-card" href="https://www.nasa.gov/international-space-station/" target="_blank" rel="noopener noreferrer">
+                <span class="story-icon" aria-hidden="true">⌁</span>
+                <span class="story-category">ESTACIÓN ESPACIAL</span>
+                <h3>Un laboratorio en órbita</h3>
+                <p>Conoce cómo viven y trabajan los astronautas a bordo de la estación espacial.</p>
+                <span class="story-link">Visitar la estación <span aria-hidden="true">↗</span></span>
+            </a>
+            <a class="story-card" href="https://astrobiology.nasa.gov/resources/graphic-histories/" target="_blank" rel="noopener noreferrer">
+                <span class="story-icon" aria-hidden="true">☄</span>
+                <span class="story-category">ASTROBIOLOGÍA</span>
+                <h3>¿Estamos solos?</h3>
+                <p>Explora cómo los científicos investigan la posibilidad de vida más allá de la Tierra.</p>
+                <span class="story-link">Descubrir astrobiología <span aria-hidden="true">↗</span></span>
+            </a>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <p>Proyecto educativo independiente. No está afiliado ni respaldado por la NASA.</p>
+        <a href="https://www.nasa.gov/es/" target="_blank" rel="noopener noreferrer">Visita NASA en Español <span aria-hidden="true">↗</span></a>
+    </footer>
+    </main>
+
+    <main id="careers-portal" class="nasa-portal content-portal careers-portal" hidden aria-labelledby="careers-title">
+        <section class="mission-hero career-hero" aria-label="Profesiones de exploración espacial">
+            <div class="hero-copy">
+                <span class="eyebrow">PERSONAS DETRÁS DE LA EXPLORACIÓN</span>
+                <h1 id="careers-title">El universo se explora en equipo.</h1>
+                <p>
+                    Astronautas, científicos, ingenieras y equipos de operaciones convierten preguntas sobre el cosmos
+                    en misiones. Hay muchas maneras de contribuir, desde la Tierra o en el espacio.
+                </p>
+                <ul class="hero-metrics" aria-label="Áreas de trabajo espacial">
+                    <li><strong>Explorar</strong><span>Misiones y vuelos</span></li>
+                    <li><strong>Investigar</strong><span>Ciencia y datos</span></li>
+                    <li><strong>Construir</strong><span>Ingeniería y tecnología</span></li>
+                </ul>
+            </div>
+            <aside class="hero-feature-card career-feature-card">
+                <div class="feature-header">
+                    <span class="feature-kicker">UN OBJETIVO, MUCHOS CAMINOS</span>
+                    <span class="feature-tag">EQUIPO</span>
+                </div>
+                <h2>No hay una sola profesión para trabajar en el espacio.</h2>
+                <div class="feature-list">
+                    <div>
+                        <span class="list-label">Encuentra tu lugar</span>
+                        <p>La ciencia, la salud, el software, la robótica y las operaciones se unen en cada misión.</p>
+                    </div>
+                    <div><a class="feature-link" href="#career-roles">Explorar profesiones <span aria-hidden="true">↓</span></a></div>
+                </div>
+            </aside>
+        </section>
+
+        <section id="career-roles" class="discover-section" aria-labelledby="career-roles-title">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">ROLES EN LA EXPLORACIÓN ESPACIAL</span>
+                    <h2 id="career-roles-title">Una misión necesita muchas miradas</h2>
+                </div>
+                <p>Conoce algunas de las personas que preparan misiones, estudian el universo y hacen posible explorar.</p>
+            </div>
+            <div class="story-grid career-grid">
+                <article class="story-card career-role-card">
+                    <span class="story-icon" aria-hidden="true">🧑‍🚀</span>
+                    <span class="story-category">VUELO ESPACIAL</span>
+                    <h3>Astronauta</h3>
+                    <p>Entrena para operar naves y equipos, realizar experimentos y trabajar con seguridad en misiones tripuladas.</p>
+                    <span class="career-skills">Trabajo en equipo · Ciencia · Operaciones</span>
+                </article>
+                <article class="story-card career-role-card">
+                    <span class="story-icon" aria-hidden="true">🔭</span>
+                    <span class="story-category">INVESTIGACIÓN</span>
+                    <h3>Astrónoma o astrofísico</h3>
+                    <p>Analiza la luz y otros datos de telescopios para investigar estrellas, galaxias, exoplanetas y el universo.</p>
+                    <span class="career-skills">Física · Matemáticas · Datos</span>
+                </article>
+                <article class="story-card career-role-card">
+                    <span class="story-icon" aria-hidden="true">🪨</span>
+                    <span class="story-category">MUNDOS Y MATERIALES</span>
+                    <h3>Científica planetaria</h3>
+                    <p>Estudia planetas, lunas, asteroides y sus superficies para reconstruir cómo se formaron y evolucionan.</p>
+                    <span class="career-skills">Geología · Química · Observación</span>
+                </article>
+                <article class="story-card career-role-card">
+                    <span class="story-icon" aria-hidden="true">🛠️</span>
+                    <span class="story-category">DISEÑO DE MISIONES</span>
+                    <h3>Ingeniero aeroespacial</h3>
+                    <p>Diseña y prueba vehículos, instrumentos, sistemas de navegación y tecnología que deben funcionar en condiciones extremas.</p>
+                    <span class="career-skills">Ingeniería · Diseño · Pruebas</span>
+                </article>
+                <article class="story-card career-role-card">
+                    <span class="story-icon" aria-hidden="true">🤖</span>
+                    <span class="story-category">ROBÓTICA Y SOFTWARE</span>
+                    <h3>Especialista en robótica o software</h3>
+                    <p>Crea robots, vehículos exploradores y programas que ayudan a las misiones a percibir, decidir y actuar a distancia.</p>
+                    <span class="career-skills">Programación · Robótica · Sistemas</span>
+                </article>
+                <article class="story-card career-role-card">
+                    <span class="story-icon" aria-hidden="true">🎧</span>
+                    <span class="story-category">CENTRO DE CONTROL</span>
+                    <h3>Controlador de vuelo</h3>
+                    <p>Supervisa telemetría y coordina equipos en tierra para apoyar a la tripulación y responder durante una misión.</p>
+                    <span class="career-skills">Análisis · Comunicación · Decisiones</span>
+                </article>
+                <article class="story-card career-role-card">
+                    <span class="story-icon" aria-hidden="true">🧬</span>
+                    <span class="story-category">VIDA Y SALUD</span>
+                    <h3>Astrobióloga o especialista biomédico</h3>
+                    <p>Investiga los límites de la vida y cómo los vuelos espaciales afectan a los seres humanos y a otros organismos.</p>
+                    <span class="career-skills">Biología · Medicina · Investigación</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="career-path" aria-labelledby="career-path-title">
+            <div>
+                <span class="eyebrow">EMPIEZA A EXPLORAR</span>
+                <h2 id="career-path-title">Tu camino puede comenzar hoy</h2>
+                <p>Las rutas profesionales y requisitos cambian según el puesto y la agencia. Estas ideas son un punto de partida.</p>
+            </div>
+            <ol>
+                <li><strong>1. Sigue tu curiosidad</strong><span>Explora ciencias, matemáticas, salud, diseño o tecnología.</span></li>
+                <li><strong>2. Practica creando</strong><span>Prueba proyectos, clubes, observación del cielo o programación.</span></li>
+                <li><strong>3. Aprende en equipo</strong><span>Investiga estudios y oportunidades en universidades y agencias espaciales.</span></li>
+            </ol>
+        </section>
+
+        <footer class="site-footer">
+            <p>Contenido educativo: las funciones y requisitos pueden variar entre organizaciones y países.</p>
+            <a href="https://www.nasa.gov/careers/" target="_blank" rel="noopener noreferrer">Carreras en NASA <span aria-hidden="true">↗</span></a>
+        </footer>
+    </main>
+
+    <!-- Panel Lateral HUD Glassmorphism: Telemetría e Inteligencia Artificial -->
+    <aside id="hud-panel" class="hud-panel hidden" aria-label="Panel de Información y Telemetría">
+        <div class="hud-frame">
+            <!-- Cabecera del Astro Seleccionado -->
+            <div class="hud-header">
+                <div class="hud-title-group">
+                    <span id="hud-category-badge" class="hud-category-badge">SISTEMA SOLAR</span>
+                    <h2 id="hud-astro-name" class="hud-astro-name">MARTE</h2>
+                    <span id="hud-astro-subtitle" class="hud-astro-subtitle">PLANETA ROCOSO // TERCER MUNDO INTERIOR</span>
+                </div>
+                <button id="btn-close-hud" class="btn-close-hud" title="Cerrar panel de telemetría" aria-label="Cerrar">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Ficha Técnica / Descripción Científica -->
+            <div class="hud-section">
+                <div class="section-label">
+                    <span class="label-bracket">[</span>
+                    <span>DATOS DE EXPLORACIÓN</span>
+                    <span class="label-bracket">]</span>
+                </div>
+                <p id="hud-astro-description" class="hud-description">
+                    Cargando información del astro seleccionado...
+                </p>
+            </div>
+
+            <div class="hud-divider"></div>
+
+            <!-- Interfaz de la Computadora de a Bordo (IA) -->
+            <div class="hud-section ai-comm-section">
+                <div class="ai-header">
+                    <div class="ai-avatar">
+                        <div class="ai-core-pulse"></div>
+                    </div>
+                    <div class="ai-info">
+                        <span class="ai-name">COMPUTADORA DE A BORDO</span>
+                        <span class="ai-protocol">PROTOCOLO COGNITIVO V4.2</span>
+                    </div>
+                    <div class="ai-encryption-badge">PROTEGIDO</div>
+                </div>
+
+                <!-- Historial de Conversación Contextual -->
+                <div id="chat-messages" class="chat-messages-container">
+                    <div class="message-bubble system">
+                        <span class="msg-sender">SISTEMA:</span>
+                        <p class="msg-content">Canal cuántico establecido. Puedes formular preguntas directas o utilizar las consultas rápidas recomendadas.</p>
+                    </div>
+                </div>
+
+                <!-- Indicador de Procesamiento de la IA -->
+                <div id="chat-loading-indicator" class="chat-loading-indicator hidden">
+                    <span class="loader-orbit"></span>
+                    <span class="loading-label">Analizando espectrometría y procesando respuesta...</span>
+                </div>
+
+                <!-- Tres Preguntas Rápidas Dinámicas -->
+                <div class="quick-prompts-wrapper">
+                    <div class="quick-prompts-label">CONSULTAS RÁPIDAS RECOMENDADAS:</div>
+                    <div id="quick-prompts-container" class="quick-prompts-container">
+                        <!-- Generadas dinámicamente según el astro seleccionado -->
+                    </div>
+                </div>
+
+                <!-- Formulario de Entrada del Explorador -->
+                <form id="chat-form" class="chat-input-form" onsubmit="return false;">
+                    <div class="input-wrapper">
+                        <input type="text" 
+                               id="chat-input" 
+                               class="chat-input" 
+                               placeholder="Formula una pregunta a la computadora..." 
+                               maxlength="500" 
+                               autocomplete="off" />
+                        <button type="submit" id="btn-send-chat" class="btn-send-chat" title="Transmitir pregunta">
+                            <span class="send-text">ENVIAR</span>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Efecto Óptico de Transición Suave entre Secciones -->
+    <div id="warp-overlay" class="warp-overlay"></div>
+</div>

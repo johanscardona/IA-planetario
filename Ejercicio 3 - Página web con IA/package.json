@@ -1,0 +1,20 @@
+{
+  "name": "astronomia-3d-planetario",
+  "version": "2.0.0",
+  "description": "Plataforma Web Inmersiva de Astronomía 3D con Three.js, ASP.NET Core MVC y Computadora de a Bordo con IA",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "astronomy",
+    "threejs",
+    "webgl",
+    "ai",
+    "aspnetcore",
+    "spacecraft"
+  ],
+  "author": "Equipo de Desarrollo de Software / Proyecto Competencia Tecnológica",
+  "license": "MIT"
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Astralis | Exploración espacial</title>
+    <meta name="description" content="Explora el universo, las misiones de la NASA, nuestro planeta y recursos de ciencia en español." />
+
+    <!-- Tipografías Oficiales: Montserrat (Títulos) & Open Sans (Contenido) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <!-- Hoja de Estilos Futurista y Glassmorphism -->
+    <link rel="stylesheet" href="~/css/astronomy.css" asp-append-version="true" />
+
+    <!-- Three.js y Extensiones Oficiales (Carga local garantizada sin dependencia de red) -->
+    <script src="~/js/lib/three.min.js"></script>
+    <script>
+        if (typeof THREE === 'undefined') {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+        }
+    </script>
+    <script src="~/js/lib/GLTFLoader.js"></script>
+    <script src="~/js/lib/OrbitControls.js"></script>
+</head>
+<body>
+    @RenderBody()
+
+    <!-- Módulos Frontend Vanilla JavaScript -->
+    <script src="~/js/catalog.js" asp-append-version="true"></script>
+    <script src="~/js/scene.js" asp-append-version="true"></script>
+    <script src="~/js/ai-chat.js" asp-append-version="true"></script>
+    <script src="~/js/app.js" asp-append-version="true"></script>
+</body>
+</html>
